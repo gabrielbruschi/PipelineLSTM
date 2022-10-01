@@ -21,7 +21,7 @@ def homepage():
     
     #codigo
     obj = yf.Ticker('petr4.sa')
-    data = obj.history(start='2022-01-01')
+    data = obj.history(start='2018-01-01')
     df = data.dropna()
 
     df_acao_fec = df[['Close']]
