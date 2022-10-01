@@ -76,7 +76,7 @@ def homepage():
     model.summary()
 
     #Treinamento do modelo
-    validation = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=100, batch_size=15, verbose=2)
+    validation = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=30, batch_size=15, verbose=2)
 
     #Fazendo previsao
     prev = model.predict(X_test)
