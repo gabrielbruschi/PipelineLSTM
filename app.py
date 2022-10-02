@@ -2,19 +2,16 @@ from flask import Flask
 
 import numpy as np
 import pandas as pd
-import tensorflow as tf
-from tensorflow import keras
-from keras import layers
+#import tensorflow as tf
+#from tensorflow import keras
+#from keras import layers
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, Dropout
 from sklearn.preprocessing import StandardScaler #normalizar os dados
-from sklearn.model_selection import train_test_split #treinamento e teste
+#from sklearn.model_selection import train_test_split #treinamento e teste
 import yfinance as yf
 
 app = Flask(__name__)
-# route -> hashtagtreinamentos.com/
-# função -> o que você quer exibir naquela página
-# template
 
 @app.route('/')
 def homepage():
@@ -32,10 +29,10 @@ def homepage():
     qtd_linhas_treino = round(.70 * qtd_linhas)
     qtd_linhas_teste = qtd_linhas - qtd_linhas_treino
 
-    info = (
-        f"linhas treino = 0{qtd_linhas_treino}"
-        f"linhas teste = {qtd_linhas_treino}:{qtd_linhas_treino + qtd_linhas_teste}"
-    )
+    #info = (
+    #    f"linhas treino = 0{qtd_linhas_treino}"
+    #    f"linhas teste = {qtd_linhas_treino}:{qtd_linhas_treino + qtd_linhas_teste}"
+    #)
 
     #Normalizar os dados
     scaler = StandardScaler()
@@ -61,18 +58,18 @@ def homepage():
 
 
      # Gerando os dados que o modelo espera
-    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1) #1 'e a qntd de features
+    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
     X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
 
     #Montando a rede
     model = Sequential()
-    model.add(LSTM(35, return_sequences=True, input_shape=(steps, 1))) #35 neuronios, o return_seq = true : pega a informacao q sai e reinsere, dados com memoria
+    model.add(LSTM(35, return_sequences=True, input_shape=(steps, 1)))
     model.add(LSTM(35, return_sequences=True))
     model.add(LSTM(35))
-    model.add(Dropout(0.05)) #ANTES ERA 0.2 #nao causar um overfit (rede muito treinada), dou uma penalizada na feature
-    model.add(Dense(1)) #saida unica do preco que queremos prever
+    model.add(Dropout(0.05)) 
+    model.add(Dense(1)) 
 
-    model.compile(optimizer='adam', loss='mse') #adam mais usado, loss: minimun sequer error, ver o quanto minha rede esta performando
+    model.compile(optimizer='adam', loss='mse')
     model.summary()
 
     #Treinamento do modelo
@@ -80,7 +77,8 @@ def homepage():
 
     #Fazendo previsao
     prev = model.predict(X_test)
-    prev = scaler.inverse_transform(prev) #removo a normalizacao
+    #Removendo a normalizacao
+    prev = scaler.inverse_transform(prev)
 
     #previsão para os proximos 10 dias
     lenght_test = len(test)
@@ -97,7 +95,6 @@ def homepage():
     list_output_steps = list_output_steps[0].tolist()
 
     #loop para prever os proximos 10 dias
-
     pred_output = []
     i = 0
     n_future = 10
@@ -136,8 +133,7 @@ def homepage():
     df1 = df.reset_index()
     #pegar as datas de previsão 
     dates = pd.to_datetime(df1['Date'])
-    predict_dates = pd.date_range(list(dates)[-1] + pd.DateOffset(1), periods = 10, freq='b').tolist() #freq b = dias bussins
-
+    predict_dates = pd.date_range(list(dates)[-1] + pd.DateOffset(1), periods = 10, freq='b').tolist()
 
     #cria dataframe de previsao
     forecast_dates = []
@@ -149,10 +145,5 @@ def homepage():
 
     df_forecast = df_forecast.set_index(pd.DatetimeIndex(df_forecast['data_pregao'].values))
     df_forecast.drop('data_pregao', axis = 1, inplace = True)
-    ##fim codigo
     
     return df_forecast.to_html()
-
-@app.route('/usuario')
-def user():
-    return '<h1>Welcome user<h1>'
